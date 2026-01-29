@@ -29,8 +29,14 @@ model Pet {
   id          String   @id @default(cuid())
   name        String
   type        PetType
-  age         Int
+  breed       String   @default("Sem raça definida")
+  birthDate   DateTime @default(now())
   description String?
+  
+  // Informações do dono
+  ownerName   String   @default("Não informado")
+  ownerPhone  String   @default("(00) 0 0000-0000")
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
