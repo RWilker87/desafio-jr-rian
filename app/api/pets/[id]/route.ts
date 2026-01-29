@@ -94,7 +94,15 @@ export async function PUT(
         // Atualizar pet
         const pet = await prisma.pet.update({
             where: { id },
-            data: validatedData,
+            data: {
+                name: validatedData.name,
+                type: validatedData.type,
+                breed: validatedData.breed,
+                birthDate: new Date(validatedData.birthDate),
+                description: validatedData.description || null,
+                ownerName: validatedData.ownerName,
+                ownerPhone: validatedData.ownerPhone,
+            },
         });
 
         return NextResponse.json({ pet });

@@ -50,7 +50,13 @@ export async function POST(request: NextRequest) {
         // Criar pet associado ao usuário
         const pet = await prisma.pet.create({
             data: {
-                ...validatedData,
+                name: validatedData.name,
+                type: validatedData.type,
+                breed: validatedData.breed,
+                birthDate: new Date(validatedData.birthDate),
+                description: validatedData.description || null,
+                ownerName: validatedData.ownerName,
+                ownerPhone: validatedData.ownerPhone,
                 userId: user.userId,
             },
         });
