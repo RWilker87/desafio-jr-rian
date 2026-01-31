@@ -174,7 +174,63 @@ model Pet {
 
 ---
 
-## 🧪 Como Testar
+---
+
+## 🧪 Testes Automatizados
+
+### Configuração
+
+O projeto utiliza **Vitest** para testes de integração com banco de dados real (PostgreSQL via Docker).
+
+**Dependências:**
+- `vitest` - Framework de testes rápido e moderno
+- `@vitejs/plugin-react` - Plugin para React
+- `happy-dom` - Ambiente DOM leve
+
+### Executar Testes
+
+```bash
+# Subir banco de dados (necessário para testes de integração)
+docker-compose up -d
+
+# Rodar migrations
+npx prisma migrate dev
+
+# Executar todos os testes
+npm test
+
+# Modo watch (desenvolvimento)
+npm run test:watch
+
+# Com interface visual
+npm run test:ui
+```
+
+### Testes Implementados
+
+#### ✅ Teste de Integração - Login (`tests/integration/auth.test.ts`)
+
+Valida o fluxo completo de autenticação:
+
+1. **Login com credenciais válidas**
+   - Cria usuário de teste no banco real
+   - Envia POST /api/auth/login
+   - Verifica status 200
+   - Valida presença do cookie `auth_token`
+   - Valida flags de segurança (HttpOnly, SameSite)
+   - Valida estrutura da resposta JSON
+
+2. **Login com credenciais inválidas**
+   - Testa senha incorreta
+   - Verifica status 401 Unauthorized
+
+3. **Validação de dados**
+   - Testa email malformado
+   - Verifica status 400 Bad Request
+
+---
+
+## 🧪 Como Testar Manualmente
 
 1.  **Registro:** Crie uma conta em `/register`. A senha exige min. 6 caracteres.
 2.  **Dashboard:** Adicione alguns pets.
@@ -191,6 +247,9 @@ npx prisma studio
 
 # Gerar tipagens do Prisma após alterar schema
 npx prisma generate
+
+# Rodar testes
+npm test
 ```
 
 ---
