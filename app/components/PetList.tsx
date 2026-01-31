@@ -1,39 +1,44 @@
 'use client';
 
-import type { Pet, PetListProps } from '@/types';
+import type { Pet } from '@/types';
 import PetCardExpandable from './PetCardExpandable';
 
 /**
  * Componente para renderização do grid de pets
  * Responsabilidade única: exibir lista de pets com estados vazios
+ * A filtragem agora é feita no backend via API
  */
+
+interface PetListProps {
+    pets: Pet[];
+    currentUserId: string | null;
+    selectedPetId: string | null;
+    hasSearchQuery: boolean;
+    onSelectPet: (petId: string) => void;
+    onEditPet: (pet: Pet) => void;
+    onDeletePet: (pet: Pet) => void;
+}
 
 export default function PetList({
     pets,
     currentUserId,
     selectedPetId,
-    searchQuery,
+    hasSearchQuery,
     onSelectPet,
     onEditPet,
     onDeletePet,
 }: PetListProps) {
-    // Filtrar pets baseado na busca
-    const filteredPets = pets.filter(pet =>
-        pet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pet.ownerName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
     // Estado vazio - sem pets
-    if (filteredPets.length === 0) {
+    if (pets.length === 0) {
         return (
             <div className="text-center py-20">
                 <p className="text-white/60 text-lg">
-                    {searchQuery
+                    {hasSearchQuery
                         ? 'Nenhum pet encontrado com esse termo.'
                         : 'Você ainda não tem pets cadastrados.'
                     }
                 </p>
-                {!searchQuery && (
+                {!hasSearchQuery && (
                     <p className="text-white/40 mt-2">
                         Clique em "Cadastrar" para adicionar um pet!
                     </p>
@@ -46,7 +51,7 @@ export default function PetList({
         <>
             <div className="border-2 border-[#0056E2] rounded-2xl p-6 mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredPets.map((pet) => (
+                    {pets.map((pet) => (
                         <PetCardExpandable
                             key={pet.id}
                             pet={pet}
@@ -67,7 +72,7 @@ export default function PetList({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
-                <span className="text-sm">1 de {Math.max(1, Math.ceil(filteredPets.length / 16))}</span>
+                <span className="text-sm">1 de {Math.max(1, Math.ceil(pets.length / 16))}</span>
                 <button className="p-2 hover:bg-white/10 rounded-lg transition">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
