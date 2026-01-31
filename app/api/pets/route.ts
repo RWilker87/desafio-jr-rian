@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { petSchema } from '@/lib/validations/pet';
 
-// GET /api/pets - Listar todos os pets do usuário autenticado
+// GET /api/pets - Listar TODOS os pets (público)
 export async function GET() {
     try {
         const user = await getCurrentUser();
@@ -15,12 +15,12 @@ export async function GET() {
             );
         }
 
+        // Retornar TODOS os pets, não apenas do usuário logado
         const pets = await prisma.pet.findMany({
-            where: { userId: user.userId },
             orderBy: { createdAt: 'desc' },
         });
 
-        return NextResponse.json({ pets });
+        return NextResponse.json({ pets, currentUserId: user.userId });
     } catch (error) {
         console.error('Erro ao listar pets:', error);
         return NextResponse.json(
@@ -29,6 +29,7 @@ export async function GET() {
         );
     }
 }
+
 
 // POST /api/pets - Criar novo pet
 export async function POST(request: NextRequest) {
