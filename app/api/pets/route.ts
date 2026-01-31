@@ -3,8 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { petSchema } from '@/lib/validations/pet';
 
-// GET /api/pets - Listar TODOS os pets (público)
-export async function GET() {
+// GET /api/pets - Listar TODOS os pets com suporte a busca
+// Query params: ?q=termo (busca por nome do pet OU nome do dono)
+export async function GET(request: NextRequest) {
     try {
         const user = await getCurrentUser();
 
@@ -15,8 +16,23 @@ export async function GET() {
             );
         }
 
-        // Retornar TODOS os pets, não apenas do usuário logado
+        // Obter query param de busca
+        const { searchParams } = new URL(request.url);
+        const searchQuery = searchParams.get('q')?.trim();
+
+        // Construir filtro de busca
+        const whereClause = searchQuery
+            ? {
+                OR: [
+                    { name: { contains: searchQuery, mode: 'insensitive' as const } },
+                    { ownerName: { contains: searchQuery, mode: 'insensitive' as const } },
+                ],
+            }
+            : {};
+
+        // Buscar pets com filtro opcional
         const pets = await prisma.pet.findMany({
+            where: whereClause,
             orderBy: { createdAt: 'desc' },
         });
 
