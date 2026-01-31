@@ -16,10 +16,10 @@ interface UsePetsReturn {
     currentUserId: string | null;
     isLoading: boolean;
 
-    // Busca
+    // Busca (server-side)
     searchQuery: string;
     setSearchQuery: (query: string) => void;
-    filteredPets: Pet[];
+    handleSearch: () => void;
 
     // Estado de modais
     isCreating: boolean;
@@ -81,11 +81,12 @@ export function usePets(): UsePetsReturn {
         }
     }, []);
 
-    // Fetch pets
-    const fetchPets = useCallback(async () => {
+    // Fetch pets com suporte a busca server-side
+    const fetchPets = useCallback(async (query?: string) => {
         setIsLoading(true);
         try {
-            const response = await fetch('/api/pets');
+            const url = query ? `/api/pets?q=${encodeURIComponent(query)}` : '/api/pets';
+            const response = await fetch(url);
             if (response.ok) {
                 const data = await response.json();
                 setPets(data.pets);
@@ -104,11 +105,18 @@ export function usePets(): UsePetsReturn {
         fetchPets();
     }, [fetchUser, fetchPets]);
 
-    // Pets filtrados por busca
-    const filteredPets = pets.filter(pet =>
-        pet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pet.ownerName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Busca com debounce (300ms) - server-side
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            fetchPets(searchQuery || undefined);
+        }, 300);
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery, fetchPets]);
+
+    // Handler de busca manual (botão)
+    const handleSearch = useCallback(() => {
+        fetchPets(searchQuery || undefined);
+    }, [searchQuery, fetchPets]);
 
     // Handlers
     const handleSelectPet = useCallback((petId: string) => {
@@ -200,10 +208,10 @@ export function usePets(): UsePetsReturn {
         currentUserId,
         isLoading,
 
-        // Busca
+        // Busca (server-side)
         searchQuery,
         setSearchQuery,
-        filteredPets,
+        handleSearch,
 
         // Modais
         isCreating,
