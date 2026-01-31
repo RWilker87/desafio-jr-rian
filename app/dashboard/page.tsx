@@ -115,7 +115,7 @@ export default function DashboardPage() {
                             pets={pets}
                             currentUserId={currentUserId}
                             selectedPetId={selectedPetId}
-                            searchQuery={searchQuery}
+                            hasSearchQuery={searchQuery.length > 0}
                             onSelectPet={handleSelectPet}
                             onEditPet={setEditingPet}
                             onDeletePet={setDeletingPet}
