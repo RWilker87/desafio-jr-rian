@@ -1,26 +1,6 @@
 'use client';
 
-interface Pet {
-    id: string;
-    name: string;
-    type: 'DOG' | 'CAT';
-    breed: string;
-    birthDate: string;
-    description: string | null;
-    ownerName: string;
-    ownerPhone: string;
-    userId: string;
-    createdAt: string;
-}
-
-interface PetCardExpandableProps {
-    pet: Pet;
-    isSelected: boolean;
-    isOwner: boolean;
-    onSelect: (petId: string) => void;
-    onEdit: (pet: Pet) => void;
-    onDelete: (pet: Pet) => void;
-}
+import type { Pet, PetCardExpandableProps } from '@/types';
 
 // Função para calcular idade
 function calculateAge(birthDateString: string): { years: number; date: string } {
@@ -167,8 +147,8 @@ export default function PetCardExpandable({
                             }}
                             disabled={!isOwner}
                             className={`flex-1 px-4 py-3 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${isOwner
-                                    ? 'bg-white hover:bg-gray-100 text-[#0056E2] cursor-pointer'
-                                    : 'bg-[#404A5C]/30 text-white/40 cursor-not-allowed'
+                                ? 'bg-white hover:bg-gray-100 text-[#0056E2] cursor-pointer'
+                                : 'bg-[#404A5C]/30 text-white/40 cursor-not-allowed'
                                 }`}
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,8 +165,8 @@ export default function PetCardExpandable({
                             }}
                             disabled={!isOwner}
                             className={`flex-1 px-4 py-3 font-semibold rounded-lg transition flex items-center justify-center gap-2 ${isOwner
-                                    ? 'bg-gradient-to-r from-[#00CAFC] to-[#0056E2] hover:opacity-90 text-white cursor-pointer'
-                                    : 'bg-[#404A5C]/30 text-white/40 cursor-not-allowed'
+                                ? 'bg-gradient-to-r from-[#00CAFC] to-[#0056E2] hover:opacity-90 text-white cursor-pointer'
+                                : 'bg-[#404A5C]/30 text-white/40 cursor-not-allowed'
                                 }`}
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

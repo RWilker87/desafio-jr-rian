@@ -1,168 +1,54 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePets } from '@/hooks/usePets';
+import PetList from '../components/PetList';
 import PetDeleteModal from '../components/PetDeleteModal';
 import PetEditModal from '../components/PetEditModal';
 import PetCreateModal from '../components/PetCreateModal';
-import PetCardExpandable from '../components/PetCardExpandable';
-import type { PetInput } from '@/lib/validations/pet';
 
-interface Pet {
-    id: string;
-    name: string;
-    type: 'DOG' | 'CAT';
-    breed: string;
-    birthDate: string;
-    description: string | null;
-    ownerName: string;
-    ownerPhone: string;
-    userId: string;
-    createdAt: string;
-}
-
-
-interface User {
-    id: string;
-    email: string;
-}
-
+/**
+ * Dashboard Page - Refatorado seguindo Clean Code
+ * 
+ * Antes: 300 linhas com lógica e UI misturados
+ * Depois: ~100 linhas focado apenas em composição de UI
+ * 
+ * Lógica de estado e CRUD extraída para usePets hook
+ * Renderização do grid extraída para PetList component
+ */
 export default function DashboardPage() {
-    const router = useRouter();
-    const [user, setUser] = useState<User | null>(null);
-    const [pets, setPets] = useState<Pet[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isCreating, setIsCreating] = useState(false);
-    const [deletingPet, setDeletingPet] = useState<Pet | null>(null);
-    const [editingPet, setEditingPet] = useState<Pet | null>(null);
-    const [isCreateLoading, setIsCreateLoading] = useState(false);
-    const [isDeleteLoading, setIsDeleteLoading] = useState(false);
-    const [isEditLoading, setIsEditLoading] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const {
+        // Estado
+        pets,
+        currentUserId,
+        isLoading,
 
-    useEffect(() => {
-        fetchUser();
-        fetchPets();
-    }, []);
+        // Busca
+        searchQuery,
+        setSearchQuery,
 
-    const fetchUser = async () => {
-        try {
-            const response = await fetch('/api/auth/me');
-            if (response.ok) {
-                const data = await response.json();
-                setUser(data.user);
-            }
-        } catch (error) {
-            console.error('Erro ao buscar usuário:', error);
-        }
-    };
+        // Modais
+        isCreating,
+        setIsCreating,
+        editingPet,
+        setEditingPet,
+        deletingPet,
+        setDeletingPet,
 
-    const fetchPets = async () => {
-        setIsLoading(true);
-        try {
-            const response = await fetch('/api/pets');
-            if (response.ok) {
-                const data = await response.json();
-                setPets(data.pets);
-                setCurrentUserId(data.currentUserId); // Guardar ID do usuário logado
-            }
-        } catch (error) {
-            console.error('Erro ao buscar pets:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        // Loading states
+        isCreateLoading,
+        isEditLoading,
+        isDeleteLoading,
 
-    const handleLogout = async () => {
-        try {
-            await fetch('/api/auth/logout', { method: 'POST' });
-            router.push('/login');
-        } catch (error) {
-            console.error('Erro ao fazer logout:', error);
-        }
-    };
+        // Seleção
+        selectedPetId,
+        handleSelectPet,
 
-    const handleCreateSubmit = async (data: PetInput) => {
-        setIsCreateLoading(true);
-        try {
-            const response = await fetch('/api/pets', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            });
-
-            if (response.ok) {
-                await fetchPets();
-                setIsCreating(false);
-            } else {
-                const error = await response.json();
-                alert(error.error || 'Erro ao criar pet');
-            }
-        } catch (error) {
-            alert('Erro ao criar pet');
-        } finally {
-            setIsCreateLoading(false);
-        }
-    };
-
-    const handleEditSubmit = async (data: PetInput) => {
-        if (!editingPet) return;
-
-        setIsEditLoading(true);
-        try {
-            const response = await fetch(`/api/pets/${editingPet.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            });
-
-            if (response.ok) {
-                await fetchPets();
-                setEditingPet(null);
-            } else {
-                const error = await response.json();
-                alert(error.error || 'Erro ao atualizar pet');
-            }
-        } catch (error) {
-            alert('Erro ao atualizar pet');
-        } finally {
-            setIsEditLoading(false);
-        }
-    };
-
-    const handleDeleteConfirm = async (petId: string) => {
-        setIsDeleteLoading(true);
-        try {
-            const response = await fetch(`/api/pets/${petId}`, {
-                method: 'DELETE',
-            });
-
-            if (response.ok) {
-                await fetchPets();
-                setDeletingPet(null);
-            } else {
-                const error = await response.json();
-                alert(error.error || 'Erro ao deletar pet');
-            }
-        } catch (error) {
-            alert('Erro ao deletar pet');
-        } finally {
-            setIsDeleteLoading(false);
-        }
-    };
-
-    // Toggle selected pet (fecha o anterior se outro for clicado)
-    const handleSelectPet = (petId: string) => {
-        setSelectedPetId(prev => prev === petId ? null : petId);
-    };
-
-    // Filter pets based on search query
-    const filteredPets = pets.filter(pet =>
-        pet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pet.ownerName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+        // Operações
+        handleCreateSubmit,
+        handleEditSubmit,
+        handleDeleteConfirm,
+        handleLogout,
+    } = usePets();
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#0E0014] to-[#001E4D]">
@@ -220,53 +106,20 @@ export default function DashboardPage() {
 
             <main className="px-8 pb-8">
                 <div className="max-w-[1400px] mx-auto">
-                    {/* Pet Grid */}
                     {isLoading ? (
                         <div className="text-center py-20">
                             <p className="text-white/60 text-lg">Carregando...</p>
                         </div>
-                    ) : filteredPets.length === 0 ? (
-                        <div className="text-center py-20">
-                            <p className="text-white/60 text-lg">
-                                {searchQuery ? 'Nenhum pet encontrado com esse termo.' : 'Você ainda não tem pets cadastrados.'}
-                            </p>
-                            {!searchQuery && (
-                                <p className="text-white/40 mt-2">Clique em "Cadastrar" para adicionar um pet!</p>
-                            )}
-                        </div>
                     ) : (
-                        <>
-                            <div className="border-2 border-[#0056E2] rounded-2xl p-6 mb-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {filteredPets.map((pet) => (
-                                        <PetCardExpandable
-                                            key={pet.id}
-                                            pet={pet}
-                                            isSelected={selectedPetId === pet.id}
-                                            isOwner={currentUserId === pet.userId}
-                                            onSelect={handleSelectPet}
-                                            onEdit={setEditingPet}
-                                            onDelete={setDeletingPet}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Pagination */}
-                            <div className="flex items-center justify-end gap-4 text-white">
-                                <button className="p-2 hover:bg-white/10 rounded-lg transition">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </button>
-                                <span className="text-sm">1 de {Math.max(1, Math.ceil(filteredPets.length / 16))}</span>
-                                <button className="p-2 hover:bg-white/10 rounded-lg transition">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </>
+                        <PetList
+                            pets={pets}
+                            currentUserId={currentUserId}
+                            selectedPetId={selectedPetId}
+                            searchQuery={searchQuery}
+                            onSelectPet={handleSelectPet}
+                            onEditPet={setEditingPet}
+                            onDeletePet={setDeletingPet}
+                        />
                     )}
                 </div>
             </main>
