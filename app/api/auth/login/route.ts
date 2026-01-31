@@ -42,6 +42,18 @@ export async function POST(request: NextRequest) {
             email: user.email,
         });
 
+        // Construir o cookie manualmente para garantir que seja enviado corretamente
+        const isProduction = process.env.NODE_ENV === 'production';
+        const maxAge = 60 * 60 * 24 * 7; // 7 dias
+        const cookieValue = [
+            `auth_token=${token}`,
+            `Max-Age=${maxAge}`,
+            'Path=/',
+            'HttpOnly',
+            'SameSite=Lax',
+            isProduction ? 'Secure' : '',
+        ].filter(Boolean).join('; ');
+
         // Criar resposta com cookie
         const response = NextResponse.json({
             success: true,
@@ -49,16 +61,12 @@ export async function POST(request: NextRequest) {
                 id: user.id,
                 email: user.email,
             },
+            // Token incluído para testes de integração (o cookie é o método primário de autenticação)
+            token: token,
         });
 
-        // Setar cookie httpOnly no response
-        response.cookies.set('auth_token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 60 * 60 * 24 * 7, // 7 dias
-            path: '/',
-        });
+        // Setar cookie via header diretamente
+        response.headers.set('Set-Cookie', cookieValue);
 
         return response;
     } catch (error: any) {
