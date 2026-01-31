@@ -17,8 +17,10 @@ interface Pet {
     description: string | null;
     ownerName: string;
     ownerPhone: string;
+    userId: string;
     createdAt: string;
 }
+
 
 interface User {
     id: string;
@@ -38,6 +40,7 @@ export default function DashboardPage() {
     const [isEditLoading, setIsEditLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchUser();
@@ -63,6 +66,7 @@ export default function DashboardPage() {
             if (response.ok) {
                 const data = await response.json();
                 setPets(data.pets);
+                setCurrentUserId(data.currentUserId); // Guardar ID do usuário logado
             }
         } catch (error) {
             console.error('Erro ao buscar pets:', error);
@@ -239,6 +243,7 @@ export default function DashboardPage() {
                                             key={pet.id}
                                             pet={pet}
                                             isSelected={selectedPetId === pet.id}
+                                            isOwner={currentUserId === pet.userId}
                                             onSelect={handleSelectPet}
                                             onEdit={setEditingPet}
                                             onDelete={setDeletingPet}
