@@ -3,18 +3,9 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { petSchema, type PetInput } from '@/lib/validations/pet';
+import type { Pet } from '@/types';
 import BaseModal from './BaseModal';
-
-interface Pet {
-    id: string;
-    name: string;
-    type: 'DOG' | 'CAT';
-    breed: string;
-    birthDate: string;
-    description: string | null;
-    ownerName: string;
-    ownerPhone: string;
-}
+import DatePickerPtBR from './DatePickerPtBR';
 
 interface PetEditModalProps {
     isOpen: boolean;
@@ -166,8 +157,8 @@ export default function PetEditModal({ isOpen, pet, onClose, onSubmit, isLoading
                                     type="button"
                                     onClick={() => setValue('type', 'DOG')}
                                     className={`flex-1 px-6 py-3 rounded-full border-2 font-medium transition ${selectedType === 'DOG'
-                                            ? 'bg-white border-white text-[#001E4D]'
-                                            : 'border-[#0056E2]/50 text-white/60 hover:border-[#0056E2]'
+                                        ? 'bg-white border-white text-[#001E4D]'
+                                        : 'border-[#0056E2]/50 text-white/60 hover:border-[#0056E2]'
                                         }`}
                                 >
                                     <div className="flex items-center justify-center gap-2">
@@ -184,8 +175,8 @@ export default function PetEditModal({ isOpen, pet, onClose, onSubmit, isLoading
                                     type="button"
                                     onClick={() => setValue('type', 'CAT')}
                                     className={`flex-1 px-6 py-3 rounded-full border-2 font-medium transition ${selectedType === 'CAT'
-                                            ? 'bg-white border-white text-[#001E4D]'
-                                            : 'border-[#0056E2]/50 text-white/60 hover:border-[#0056E2]'
+                                        ? 'bg-white border-white text-[#001E4D]'
+                                        : 'border-[#0056E2]/50 text-white/60 hover:border-[#0056E2]'
                                         }`}
                                 >
                                     <div className="flex items-center justify-center gap-2">
@@ -231,10 +222,10 @@ export default function PetEditModal({ isOpen, pet, onClose, onSubmit, isLoading
                                 </svg>
                                 Nascimento <span className="text-[#404A5C] font-normal">(Aproximado)</span>
                             </label>
-                            <input
-                                type="date"
-                                {...register('birthDate')}
-                                className="w-full px-4 py-3 bg-transparent border-2 border-[#0056E2]/50 rounded-xl text-white placeholder-[#404A5C] focus:border-[#00CAFC] focus:outline-none transition [color-scheme:dark]"
+                            <DatePickerPtBR
+                                value={watch('birthDate')}
+                                onChange={(date) => setValue('birthDate', date)}
+                                placeholder="DD/MM/AAAA"
                             />
                             {errors.birthDate && (
                                 <p className="text-[#ED254E] text-xs mt-1">{errors.birthDate.message}</p>
