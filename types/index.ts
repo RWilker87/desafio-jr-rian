@@ -44,12 +44,3 @@ export interface PetCardExpandableProps {
     onDelete: (pet: Pet) => void;
 }
 
-export interface PetListProps {
-    pets: Pet[];
-    currentUserId: string | null;
-    selectedPetId: string | null;
-    searchQuery: string;
-    onSelectPet: (petId: string) => void;
-    onEditPet: (pet: Pet) => void;
-    onDeletePet: (pet: Pet) => void;
-}
