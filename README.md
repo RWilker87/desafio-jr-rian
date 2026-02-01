@@ -111,40 +111,138 @@ model Pet {
 ## 🛠️ Instalação e Execução
 
 ### Pré-requisitos
-* Node.js 18+
-* PostgreSQL rodando localmente ou em container Docker
+* **Node.js 18+** - [Download](https://nodejs.org/)
+* **Docker e Docker Compose** - [Download](https://www.docker.com/products/docker-desktop/) (recomendado)
+* **Git** - [Download](https://git-scm.com/)
 
-### Passo a Passo
+---
 
-1.  **Clone o repositório:**
-    ```bash
-    git clone https://github.com/RWilker87/desafio-jr-rian.git
-    cd desafio-jr-rian
-    ```
+### 🚀 Quick Start (com Docker - Recomendado)
 
-2.  **Instale as dependências:**
-    ```bash
-    npm install
-    ```
+A forma mais rápida de rodar o projeto é usando Docker para o banco de dados:
 
-3.  **Configure as Variáveis de Ambiente:**
-    No arquivo .env
-    ```env
-    DATABASE_URL="postgresql://usuario:senha@localhost:5432/nome_do_banco?schema=public"
-    JWT_SECRET="sua-chave-secreta-super-segura"
-    ```
+```bash
+# 1. Clone o repositório
+git clone https://github.com/RWilker87/desafio-jr-rian.git
+cd desafio-jr-rian
 
-4.  **Execute as Migrations:**
-    ```bash
-    npx prisma migrate dev --name init
-    ```
+# 2. Copie o arquivo de variáveis de ambiente
+cp .env.example .env
 
-5.  **Inicie o Servidor:**
-    ```bash
-    npm run dev
-    ```
+# 3. Suba o banco de dados PostgreSQL com Docker
+docker-compose up -d
 
-6.  **Acesse:** `http://localhost:3000`
+# 4. Instale as dependências
+npm install
+
+# 5. Execute as migrations do banco de dados
+npx prisma migrate dev
+
+# 6. Inicie o servidor de desenvolvimento
+npm run dev
+```
+
+✅ **Pronto!** Acesse: [http://localhost:3000](http://localhost:3000)
+
+---
+
+### 📋 Configuração Detalhada
+
+#### 1️⃣ Clone o Repositório
+
+```bash
+git clone https://github.com/RWilker87/desafio-jr-rian.git
+cd desafio-jr-rian
+```
+
+#### 2️⃣ Configure as Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto (ou copie o `.env.example`):
+
+```bash
+cp .env.example .env
+```
+
+**Conteúdo do `.env`:**
+
+```env
+# Conexão com o PostgreSQL (Docker padrão)
+DATABASE_URL="postgresql://postgres:admin@localhost:5432/desafio_jr_rian?schema=public"
+
+# Chave secreta para JWT (TROQUE EM PRODUÇÃO!)
+JWT_SECRET="troque-por-uma-chave-segura"
+```
+
+> ⚠️ **Importante:** Em produção, use uma chave JWT forte e segura!
+
+#### 3️⃣ Configure o Banco de Dados
+
+**Opção A: Usando Docker (Recomendado)**
+
+O projeto inclui um `docker-compose.yml` que configura automaticamente o PostgreSQL:
+
+```bash
+# Subir o container do PostgreSQL
+docker-compose up -d
+
+# Verificar se está rodando
+docker ps
+```
+
+| Configuração | Valor |
+|-------------|-------|
+| Host | `localhost` |
+| Porta | `5432` |
+| Usuário | `postgres` |
+| Senha | `admin` |
+| Banco | `desafio_jr_rian` |
+
+**Comandos úteis do Docker:**
+
+```bash
+# Parar o container
+docker-compose down
+
+# Ver logs do container
+docker-compose logs -f
+
+# Parar e remover volumes (⚠️ apaga dados)
+docker-compose down -v
+```
+
+**Opção B: PostgreSQL Local**
+
+Se preferir usar uma instalação local do PostgreSQL:
+
+1. Instale o PostgreSQL na sua máquina
+2. Crie um banco de dados chamado `desafio_jr_rian`
+3. Atualize a `DATABASE_URL` no `.env` com suas credenciais
+
+#### 4️⃣ Instale as Dependências
+
+```bash
+npm install
+```
+
+#### 5️⃣ Execute as Migrations
+
+```bash
+# Criar/atualizar as tabelas no banco de dados
+npx prisma migrate dev
+
+# (Opcional) Gerar o Prisma Client
+npx prisma generate
+```
+
+#### 6️⃣ Inicie o Servidor
+
+```bash
+npm run dev
+```
+
+#### 7️⃣ Acesse a Aplicação
+
+Abra seu navegador em: [http://localhost:3000](http://localhost:3000)
 
 ---
 
